@@ -1,4 +1,4 @@
-package com.afakenkin.productservice;
+package com.afalenkin.productservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

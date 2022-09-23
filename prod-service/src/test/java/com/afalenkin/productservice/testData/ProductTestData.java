@@ -1,7 +1,7 @@
-package com.afakenkin.productservice.testData;
+package com.afalenkin.productservice.testData;
 
-import com.afakenkin.productservice.dto.ProductRequest;
-import com.afakenkin.productservice.model.Product;
+import com.afalenkin.productservice.dto.ProductRequest;
+import com.afalenkin.productservice.model.Product;
 
 import java.math.BigDecimal;
 

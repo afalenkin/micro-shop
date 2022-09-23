@@ -1,6 +1,6 @@
-package com.afakenkin.productservice.repository;
+package com.afalenkin.productservice.repository;
 
-import com.afakenkin.productservice.model.Product;
+import com.afalenkin.productservice.model.Product;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 /**

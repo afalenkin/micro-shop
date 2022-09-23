@@ -1,9 +1,9 @@
-package com.afakenkin.productservice.service;
+package com.afalenkin.productservice.service;
 
-import com.afakenkin.productservice.dto.ProductRequest;
-import com.afakenkin.productservice.dto.ProductResponse;
-import com.afakenkin.productservice.model.Product;
-import com.afakenkin.productservice.repository.ProductRepository;
+import com.afalenkin.productservice.dto.ProductRequest;
+import com.afalenkin.productservice.dto.ProductResponse;
+import com.afalenkin.productservice.model.Product;
+import com.afalenkin.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

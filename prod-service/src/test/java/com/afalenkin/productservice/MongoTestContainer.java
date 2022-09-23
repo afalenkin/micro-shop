@@ -1,4 +1,4 @@
-package com.afakenkin.productservice;
+package com.afalenkin.productservice;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;

@@ -1,8 +1,8 @@
-package com.afakenkin.productservice.controller;
+package com.afalenkin.productservice.controller;
 
-import com.afakenkin.productservice.dto.ProductRequest;
-import com.afakenkin.productservice.dto.ProductResponse;
-import com.afakenkin.productservice.service.ProductServiceImpl;
+import com.afalenkin.productservice.dto.ProductRequest;
+import com.afalenkin.productservice.dto.ProductResponse;
+import com.afalenkin.productservice.service.ProductServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;

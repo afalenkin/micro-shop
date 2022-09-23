@@ -1,7 +1,7 @@
-package com.afakenkin.productservice.controller;
+package com.afalenkin.productservice.controller;
 
-import com.afakenkin.productservice.MongoTestContainer;
-import com.afakenkin.productservice.repository.ProductRepository;
+import com.afalenkin.productservice.MongoTestContainer;
+import com.afalenkin.productservice.repository.ProductRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static com.afakenkin.productservice.testData.ProductTestData.getProductRequest;
+import static com.afalenkin.productservice.testData.ProductTestData.getProductRequest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 

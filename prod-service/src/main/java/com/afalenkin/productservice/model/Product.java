@@ -1,4 +1,4 @@
-package com.afakenkin.productservice.model;
+package com.afalenkin.productservice.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
