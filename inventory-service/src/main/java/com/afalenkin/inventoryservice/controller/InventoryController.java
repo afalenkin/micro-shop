@@ -1,13 +1,16 @@
 package com.afalenkin.inventoryservice.controller;
 
+import com.afalenkin.inventoryservice.dto.InventoryResponse;
 import com.afalenkin.inventoryservice.service.InventoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * @author Alenkin Andrew
@@ -19,9 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class InventoryController {
     private final InventoryService inventoryService;
 
-    @GetMapping("/{code}")
+    @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public boolean isInStock(@PathVariable(value = "code") String code) {
-        return inventoryService.isInStock(code);
+    public List<InventoryResponse> isInStock(@RequestBody List<String> codes) {
+        return inventoryService.isInStock(codes);
     }
 }

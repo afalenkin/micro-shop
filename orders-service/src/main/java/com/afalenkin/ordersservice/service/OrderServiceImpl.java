@@ -1,17 +1,20 @@
 package com.afalenkin.ordersservice.service;
 
+import com.afalenkin.ordersservice.dto.InventoryResponse;
 import com.afalenkin.ordersservice.dto.OrderItemDto;
 import com.afalenkin.ordersservice.dto.OrderRequest;
 import com.afalenkin.ordersservice.model.Order;
 import com.afalenkin.ordersservice.model.OrderItem;
 import com.afalenkin.ordersservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * @author Alenkin Andrew
@@ -21,13 +24,34 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class OrderServiceImpl implements OrderService {
+    public static final String INVENTORY_API = "http://localhost:8082/api/v1/inventories";
     private final OrderRepository repository;
+    private final WebClient webClient;
 
     @Override
     public void placeOrder(OrderRequest orderRequest) {
+        List<String> itemCodes = orderRequest.getOrderItems().stream()
+                .map(OrderItemDto::getCode)
+                .toList();
+
+        List<InventoryResponse> inventoryResponses = webClient.put()
+                .uri(INVENTORY_API)
+                .body(BodyInserters.fromValue(itemCodes))
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<InventoryResponse>>() {
+                })
+                .block();
+
+        boolean itemsExists = (itemCodes.size() == inventoryResponses.size()) &&
+                (inventoryResponses.stream().allMatch(InventoryResponse::isInStock));
+
+        if (!itemsExists) {
+            throw new IllegalArgumentException("One item from order is absent, please try to make order later");
+        }
+
         List<OrderItem> items = orderRequest.getOrderItems().stream()
                 .map(this::toOrderItem)
-                .collect(Collectors.toList());
+                .toList();
 
         Order order = Order.builder()
                 .items(items)

@@ -1,12 +1,17 @@
 package com.afalenkin.inventoryservice.service;
 
-import org.springframework.transaction.annotation.Transactional;
+import com.afalenkin.inventoryservice.dto.InventoryResponse;
+
+import java.util.List;
 
 /**
  * @author Alenkin Andrew
  * oxqq@ya.ru
  */
 public interface InventoryService {
-    @Transactional(readOnly = true)
+
     boolean isInStock(String code);
+
+    List<InventoryResponse> isInStock(List<String> codes);
+
 }
