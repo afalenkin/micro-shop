@@ -24,9 +24,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional
 public class OrderServiceImpl implements OrderService {
-    public static final String INVENTORY_API = "http://localhost:8082/api/v1/inventories";
+    public static final String INVENTORY_API = "http://inventory/api/v1/inventories";
     private final OrderRepository repository;
-    private final WebClient webClient;
+    private final WebClient.Builder webClientBuilder;
 
     @Override
     public void placeOrder(OrderRequest orderRequest) {
@@ -34,15 +34,18 @@ public class OrderServiceImpl implements OrderService {
                 .map(OrderItemDto::getCode)
                 .toList();
 
-        List<InventoryResponse> inventoryResponses = webClient.put()
-                .uri(INVENTORY_API)
-                .body(BodyInserters.fromValue(itemCodes))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<InventoryResponse>>() {
-                })
-                .block();
+        List<InventoryResponse> inventoryResponses =
+                webClientBuilder.build()
+                        .put()
+                        .uri(INVENTORY_API)
+                        .body(BodyInserters.fromValue(itemCodes))
+                        .retrieve()
+                        .bodyToMono(new ParameterizedTypeReference<List<InventoryResponse>>() {
+                        })
+                        .block();
 
-        boolean itemsExists = (itemCodes.size() == inventoryResponses.size()) &&
+        boolean itemsExists = (inventoryResponses != null &&
+                itemCodes.size() == inventoryResponses.size()) &&
                 (inventoryResponses.stream().allMatch(InventoryResponse::isInStock));
 
         if (!itemsExists) {
