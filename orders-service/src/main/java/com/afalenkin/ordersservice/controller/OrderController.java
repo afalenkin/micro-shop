@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * @author Alenkin Andrew
  * oxqq@ya.ru
@@ -13,5 +15,5 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public interface OrderController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    String placeOrder(@RequestBody OrderRequest orderRequest);
+    CompletableFuture<String> placeOrder(@RequestBody OrderRequest orderRequest);
 }

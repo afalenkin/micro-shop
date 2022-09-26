@@ -29,7 +29,7 @@ public class OrderServiceImpl implements OrderService {
     private final WebClient.Builder webClientBuilder;
 
     @Override
-    public void placeOrder(OrderRequest orderRequest) {
+    public String placeOrder(OrderRequest orderRequest) {
         List<String> itemCodes = orderRequest.getOrderItems().stream()
                 .map(OrderItemDto::getCode)
                 .toList();
@@ -63,6 +63,7 @@ public class OrderServiceImpl implements OrderService {
 
         repository.save(order);
 
+        return "Order placed successfully";
     }
 
     private OrderItem toOrderItem(OrderItemDto dto) {

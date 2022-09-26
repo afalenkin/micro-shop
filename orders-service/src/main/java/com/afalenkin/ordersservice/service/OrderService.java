@@ -7,5 +7,5 @@ import com.afalenkin.ordersservice.dto.OrderRequest;
  * oxqq@ya.ru
  */
 public interface OrderService {
-    void placeOrder(OrderRequest orderRequest);
+    String placeOrder(OrderRequest orderRequest);
 }
