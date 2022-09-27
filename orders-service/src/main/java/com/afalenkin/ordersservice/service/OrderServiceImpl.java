@@ -7,6 +7,8 @@ import com.afalenkin.ordersservice.model.Order;
 import com.afalenkin.ordersservice.model.OrderItem;
 import com.afalenkin.ordersservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cloud.sleuth.Span;
+import org.springframework.cloud.sleuth.Tracer;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,7 @@ public class OrderServiceImpl implements OrderService {
     public static final String INVENTORY_API = "http://inventory/api/v1/inventories";
     private final OrderRepository repository;
     private final WebClient.Builder webClientBuilder;
+    private final Tracer tracer;
 
     @Override
     public String placeOrder(OrderRequest orderRequest) {
@@ -34,22 +37,29 @@ public class OrderServiceImpl implements OrderService {
                 .map(OrderItemDto::getCode)
                 .toList();
 
-        List<InventoryResponse> inventoryResponses =
-                webClientBuilder.build()
-                        .put()
-                        .uri(INVENTORY_API)
-                        .body(BodyInserters.fromValue(itemCodes))
-                        .retrieve()
-                        .bodyToMono(new ParameterizedTypeReference<List<InventoryResponse>>() {
-                        })
-                        .block();
+        // Метод placeOrder запускается асинхронно в отдельном потоке, поэтому трейсинг вызовов сторонних
+        // сервисов из этого метода не будет производиться. Чтобы сохранить трейсинг - необходимо
+        // назначить спан вручную.
+        Span inventoryServiceSpan = tracer.nextSpan().name("inventoryServiceSpan");
+        try (Tracer.SpanInScope spanInScope = tracer.withSpan(inventoryServiceSpan.start())) {
+            List<InventoryResponse> inventoryResponses =
+                    webClientBuilder.build()
+                            .put()
+                            .uri(INVENTORY_API)
+                            .body(BodyInserters.fromValue(itemCodes))
+                            .retrieve()
+                            .bodyToMono(new ParameterizedTypeReference<List<InventoryResponse>>() {
+                            })
+                            .block();
 
-        boolean itemsExists = (inventoryResponses != null &&
-                itemCodes.size() == inventoryResponses.size()) &&
-                (inventoryResponses.stream().allMatch(InventoryResponse::isInStock));
-
-        if (!itemsExists) {
-            throw new IllegalArgumentException("One item from order is absent, please try to make order later");
+            boolean itemsExists = (inventoryResponses != null &&
+                    itemCodes.size() == inventoryResponses.size()) &&
+                    (inventoryResponses.stream().allMatch(InventoryResponse::isInStock));
+            if (!itemsExists) {
+                throw new IllegalArgumentException("One item from order is absent, please try to make order later");
+            }
+        } finally {
+            inventoryServiceSpan.end();
         }
 
         List<OrderItem> items = orderRequest.getOrderItems().stream()
