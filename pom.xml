@@ -29,6 +29,7 @@
     <properties>
         <java.version>17</java.version>
         <spring-cloud.version>2021.0.4</spring-cloud.version>
+        <jib-maven-plugin.version>3.3.0</jib-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -64,6 +65,22 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+
+<!--            mvn clean compile jib:build   - Собрать докер-образ и запушить его на докер-хаб-->
+<!--            mvn clean compile jib:dockerBuild   - собрать докер-образ локально, но не пушить в хаб -->
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>${jib-maven-plugin.version}</version>
+                <configuration>
+                    <from>
+                        <image>eclipse-temurin:17.0.4.1_1-jre</image>
+                    </from>
+                    <to>
+                        <image>registry.hub.docker.com/oxqqqq/${project.artifactId}</image>
+                    </to>
                 </configuration>
             </plugin>
         </plugins>
