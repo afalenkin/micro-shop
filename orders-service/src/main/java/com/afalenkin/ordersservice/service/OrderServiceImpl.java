@@ -3,6 +3,7 @@ package com.afalenkin.ordersservice.service;
 import com.afalenkin.ordersservice.dto.InventoryResponse;
 import com.afalenkin.ordersservice.dto.OrderItemDto;
 import com.afalenkin.ordersservice.dto.OrderRequest;
+import com.afalenkin.ordersservice.events.OrderPlacedEvent;
 import com.afalenkin.ordersservice.model.Order;
 import com.afalenkin.ordersservice.model.OrderItem;
 import com.afalenkin.ordersservice.repository.OrderRepository;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.sleuth.Span;
 import org.springframework.cloud.sleuth.Tracer;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -27,9 +29,11 @@ import java.util.UUID;
 @Transactional
 public class OrderServiceImpl implements OrderService {
     public static final String INVENTORY_API = "http://inventory/api/v1/inventories";
+    public static final String KAFKA_TOPIC = "notifications";
     private final OrderRepository repository;
     private final WebClient.Builder webClientBuilder;
     private final Tracer tracer;
+    private final KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
 
     @Override
     public String placeOrder(OrderRequest orderRequest) {
@@ -72,6 +76,7 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         repository.save(order);
+        kafkaTemplate.send(KAFKA_TOPIC, new OrderPlacedEvent(order.getOrderNumber()));
 
         return "Order placed successfully";
     }
