@@ -1,6 +1,36 @@
 ---
 version: '3'
 services:
+#  prometheus
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v2.37.1
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - product-service
+      - order-service
+      - inventory-service
+      - notification-service
+
+#  grafana
+  grafana:
+    container_name: grafana
+    image: grafana/grafana-oss:8.5.2
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    links:
+      - prometheus:prometheus
+    volumes:
+      - ./grafana:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+
 #  postgres
   orders-db:
     container_name: orders-db
