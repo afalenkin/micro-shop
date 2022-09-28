@@ -138,6 +138,16 @@ services:
     ports:
       - "9411:9411"
 
+  ## Configuration Server
+  config:
+    image: oxqqqq/config-server:latest
+    container_name: config
+    pull_policy: always
+    ports:
+      - "8888:8888"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      -
   ## Eureka Server
   discovery-server:
     image: oxqqqq/discovery-server:latest
@@ -149,6 +159,7 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
       - zipkin
+      - config
 
   api-gateway:
     image:  oxqqqq/api-gateway:latest
@@ -165,6 +176,7 @@ services:
       - zipkin
       - discovery-server
       - keycloak
+      - config
 
   product-service:
     container_name: prod-service
@@ -176,6 +188,7 @@ services:
       - mongo
       - discovery-server
       - api-gateway
+      - config
 
   order-service:
     container_name: orders-service
@@ -190,6 +203,7 @@ services:
       - zipkin
       - discovery-server
       - api-gateway
+      - config
 
   inventory-service:
     container_name: inventory-service
@@ -202,6 +216,7 @@ services:
       - inventory-db
       - discovery-server
       - api-gateway
+      - config
 
   notification-service:
     container_name: notification-service
@@ -214,3 +229,4 @@ services:
       - broker
       - discovery-server
       - api-gateway
+      - config
