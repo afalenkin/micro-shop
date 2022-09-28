@@ -2,6 +2,18 @@ spring:
   cloud:
     config:
       uri: http://localhost:8888
+    vault:
+      host: vault
+      port: 8200
+      scheme: http
+      authentication: TOKEN
+      token: root
+      application-name: inventory
+      fail-fast: false
+# vault используется для хранения секретов. Для использования vault в проекте нужно: -
+#  - подключить стартер vault-config
+#  - в пропертях приложения задать хост, порт, схему и т.д... для подключения приложения к серверу vault
+#  - через консоль сервера vault добавить секреты - вручную, или импортировать их в json в виде {"ключ":"значение"}
 
 
 ---

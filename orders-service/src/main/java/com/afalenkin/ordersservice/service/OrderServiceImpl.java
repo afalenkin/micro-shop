@@ -8,6 +8,8 @@ import com.afalenkin.ordersservice.model.Order;
 import com.afalenkin.ordersservice.model.OrderItem;
 import com.afalenkin.ordersservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.sleuth.Span;
 import org.springframework.cloud.sleuth.Tracer;
 import org.springframework.core.ParameterizedTypeReference;
@@ -23,13 +25,28 @@ import java.util.UUID;
 /**
  * @author Alenkin Andrew
  * oxqq@ya.ru
+ *
+ * Аннотация RefreshScope позволяет обновлять свойства в классе, которые внедряются из файла
+ * с пропертями(application-properties). Чтобы обновить эти свойства в запущенном приложении - нужно
+ * обновить их в гит-репозитории в котором они хранятся и вызвать эндпоинт actuator/refresh этого сервиса.
+ * Чтобы был доступ к этому эндпоинту прометеуса нужно в конфигурациях приложения добавить свойство
+ * management.endpoints.web.exposure.include=*
+ *
+ * При этом значения свойств не будут обновляться автоматически при изменении их в репозитории,
+ * они обновятся только при рестарте приложения или при вызове эндпоинта актуатора
  */
 @Service
 @RequiredArgsConstructor
 @Transactional
+@RefreshScope
 public class OrderServiceImpl implements OrderService {
-    public static final String INVENTORY_API = "http://inventory/api/v1/inventories";
-    public static final String KAFKA_TOPIC = "notifications";
+
+    @Value("${orderservice.inventory.api.uri}")
+    public String inventory_api;
+
+    @Value("${orderservice.kafka.topic.name}")
+    public String kafka_topic;
+
     private final OrderRepository repository;
     private final WebClient.Builder webClientBuilder;
     private final Tracer tracer;
@@ -49,7 +66,7 @@ public class OrderServiceImpl implements OrderService {
             List<InventoryResponse> inventoryResponses =
                     webClientBuilder.build()
                             .put()
-                            .uri(INVENTORY_API)
+                            .uri(inventory_api)
                             .body(BodyInserters.fromValue(itemCodes))
                             .retrieve()
                             .bodyToMono(new ParameterizedTypeReference<List<InventoryResponse>>() {
@@ -76,7 +93,7 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         repository.save(order);
-        kafkaTemplate.send(KAFKA_TOPIC, new OrderPlacedEvent(order.getOrderNumber()));
+        kafkaTemplate.send(kafka_topic, new OrderPlacedEvent(order.getOrderNumber()));
 
         return "Order placed successfully";
     }
