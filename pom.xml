@@ -69,6 +69,7 @@
                 </configuration>
             </plugin>
 
+                 
 <!--            mvn clean compile jib:build   - Собрать докер-образ и запушить его на докер-хаб-->
 <!--            mvn clean compile jib:dockerBuild   - собрать докер-образ локально, но не пушить в хаб -->
             <plugin>
